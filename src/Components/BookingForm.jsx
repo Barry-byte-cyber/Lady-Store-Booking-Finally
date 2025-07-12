@@ -18,28 +18,29 @@ const BookingForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+ const handleSubmit = (e) => {
   e.preventDefault();
-  setConfirmation(`Booking confirmed for ${formData.name} on ${formData.date} for ${formData.items} items!`);
+
+  // Get existing bookings or initialize empty array
+  const existingBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+
+  // Calculate total items already booked for the selected date
+  const itemsBookedForDate = existingBookings
+    .filter((b) => b.date === formData.date)
+    .reduce((sum, b) => sum + Number(b.items), 0);
+
+  // Check if booking exceeds limit
+  if (itemsBookedForDate + Number(formData.items) > 80) {
+    alert("Booking failed: Daily item limit (80) exceeded.");
+    return;
+  }
+
+  // Save booking to localStorage
+  const updatedBookings = [...existingBookings, formData];
+  localStorage.setItem("bookings", JSON.stringify(updatedBookings));
+
+  alert(`Booking confirmed for ${formData.name} on ${formData.date}!`);
 };
-  return (
-    <div style={{ padding: "1rem" }}>
-      <h1>Lady Pant Store Booking</h1>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Name: </label>
-          <input name="name" value={formData.name} onChange={handleChange} />
-        </div>
-
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Email: </label>
-          <input name="email" type="email" value={formData.email} onChange={handleChange} />
-        </div>
-
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Date: </label>
-          <input name="date" type="date" value={formData.date} onChange={handleChange} />
-        </div>
 <div style={{ marginBottom: "1rem" }}>
   <label>Number of Items:</label>
   <input
