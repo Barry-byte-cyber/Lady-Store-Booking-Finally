@@ -1,4 +1,4 @@
-import BookingForm from './components/BookingForm';
+import BookingForm from './Components/BookingForm';
 
 function App() {
   return (
