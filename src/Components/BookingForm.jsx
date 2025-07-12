@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+const [confirmation, setConfirmation] = useState('');
+
 const BookingForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -17,11 +19,9 @@ const BookingForm = () => {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`Booking confirmed for ${formData.name} on ${formData.date}!`);
-    // Later we'll add backend/API handling here
-  };
-
+  e.preventDefault();
+  setConfirmation(`Booking confirmed for ${formData.name} on ${formData.date} for ${formData.items} items!`);
+};
   return (
     <div style={{ padding: "1rem" }}>
       <h1>Lady Pant Store Booking</h1>
