@@ -5,6 +5,7 @@ const BookingForm = () => {
     name: "",
     email: "",
     date: "",
+    items: '',
   });
 
   const handleChange = (e) => {
@@ -39,7 +40,16 @@ const BookingForm = () => {
           <label>Date: </label>
           <input name="date" type="date" value={formData.date} onChange={handleChange} />
         </div>
-
+<div style={{ marginBottom: "1rem" }}>
+  <label>Number of Items:</label>
+  <input
+    name="items"
+    type="number"
+    min="1"
+    value={formData.items}
+    onChange={handleChange}
+  />
+</div>
         <button type="submit">Book Now</button>
       </form>
     </div>
