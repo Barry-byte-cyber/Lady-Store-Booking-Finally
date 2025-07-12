@@ -38,7 +38,7 @@ const BookingForm = () => {
   // Save booking to localStorage
   const updatedBookings = [...existingBookings, formData];
   localStorage.setItem("bookings", JSON.stringify(updatedBookings));
-
+  console.log("Saved bookings:", localStorage.getItem("bookings"));
   alert(`Booking confirmed for ${formData.name} on ${formData.date}!`);
 };
 <div style={{ marginBottom: "1rem" }}>
