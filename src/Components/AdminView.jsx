@@ -1,43 +1,41 @@
 import React, { useEffect, useState } from "react";
 
 const AdminView = () => {
-  const [bookingsByDate, setBookingsByDate] = useState({});
+  const [bookings, setBookings] = useState([]);
 
   useEffect(() => {
-    const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
-
-    const grouped = bookings.reduce((acc, booking) => {
-      const date = booking.date;
-      const items = Number(booking.items);
-      if (!acc[date]) {
-        acc[date] = { total: 0, entries: [] };
-      }
-      acc[date].total += items;
-      acc[date].entries.push(booking);
-      return acc;
-    }, {});
-
-    setBookingsByDate(grouped);
+    const storedBookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    setBookings(storedBookings);
   }, []);
 
   return (
-    <div style={{ padding: "1rem" }}>
-      <h2>Admin View - All Bookings</h2>
-      {Object.keys(bookingsByDate).length === 0 ? (
-        <p>No bookings found.</p>
+    <div style={{ padding: "2rem" }}>
+      <h2>All Bookings (Admin View)</h2>
+      {bookings.length === 0 ? (
+        <p>No bookings available.</p>
       ) : (
-        Object.entries(bookingsByDate).map(([date, { total, entries }]) => (
-          <div key={date} style={{ marginBottom: "2rem" }}>
-            <h3>{date} - Total Items: {total}</h3>
-            <ul>
-              {entries.map((entry, idx) => (
-                <li key={idx}>
-                  {entry.name} ({entry.email}) - {entry.items} items
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th style={{ borderBottom: "1px solid #ccc", padding: "0.5rem" }}>Name</th>
+              <th style={{ borderBottom: "1px solid #ccc", padding: "0.5rem" }}>Email</th>
+              <th style={{ borderBottom: "1px solid #ccc", padding: "0.5rem" }}>Date</th>
+              <th style={{ borderBottom: "1px solid #ccc", padding: "0.5rem" }}>Time</th>
+              <th style={{ borderBottom: "1px solid #ccc", padding: "0.5rem" }}>Items</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bookings.map((booking, index) => (
+              <tr key={index}>
+                <td style={{ padding: "0.5rem" }}>{booking.name}</td>
+                <td style={{ padding: "0.5rem" }}>{booking.email}</td>
+                <td style={{ padding: "0.5rem" }}>{booking.date}</td>
+                <td style={{ padding: "0.5rem" }}>{booking.time}</td>
+                <td style={{ padding: "0.5rem" }}>{booking.items}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
