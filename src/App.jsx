@@ -1,6 +1,7 @@
 import React from "react";
 import AdminView from "./Components/AdminView";
 import BookingForm from "./Components/BookingForm";
+import CalendarView from "./components/CalendarView";
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
       <h1>Lady Pant Store Booking</h1>
       <BookingForm />
       <hr />
+      <CalendarView />
       <AdminView />
     </div>
   );
