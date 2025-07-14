@@ -1,6 +1,7 @@
 import React from "react";
-import BookingForm from "./components/BookingForm";
 import AdminView from "./Components/AdminView";
+import BookingForm from "./Components/BookingForm";
+
 function App() {
   return (
     <div>
