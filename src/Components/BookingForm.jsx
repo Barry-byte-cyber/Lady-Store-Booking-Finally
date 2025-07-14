@@ -5,72 +5,117 @@ const BookingForm = () => {
     name: "",
     email: "",
     date: "",
-    items: ""
+    time: "",
+    items: "",
   });
-
   const [confirmation, setConfirmation] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const existingBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    const newBooking = {
+      ...formData,
+      items: parseInt(formData.items, 10),
+      timestamp: new Date().toISOString(),
+    };
 
-    const itemsBookedForDate = existingBookings
+    const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    const dateTotal = bookings
       .filter((b) => b.date === formData.date)
-      .reduce((sum, b) => sum + Number(b.items), 0);
+      .reduce((sum, b) => sum + (parseInt(b.items, 10) || 0), 0);
 
-    if (itemsBookedForDate + Number(formData.items) > 80) {
-      alert("Booking failed: Daily item limit (80) exceeded.");
+    if (dateTotal + newBooking.items > 80) {
+      alert("Booking failed: Daily item limit of 80 exceeded.");
       return;
     }
 
-    const updatedBookings = [...existingBookings, formData];
-    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
-    console.log("Saved bookings:", localStorage.getItem("bookings"));
-
-    setConfirmation(`Booking confirmed for ${formData.name} on ${formData.date}!`);
-    alert(`Booking confirmed for ${formData.name} on ${formData.date}!`);
+    bookings.push(newBooking);
+    localStorage.setItem("bookings", JSON.stringify(bookings));
+    setConfirmation(
+      `Booking confirmed for ${formData.name} on ${formData.date} at ${formData.time} for ${formData.items} items.`
+    );
+    setFormData({
+      name: "",
+      email: "",
+      date: "",
+      time: "",
+      items: "",
+    });
   };
 
   return (
-    <div style={{ padding: "1rem" }}>
+    <div>
+      <h2>Lady Pant Store Booking</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "1rem" }}>
-          <label>Name: </label>
-          <input name="name" value={formData.name} onChange={handleChange} />
-        </div>
-
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Email: </label>
-          <input type="email" name="email" value={formData.email} onChange={handleChange} />
-        </div>
-
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Date: </label>
-          <input type="date" name="date" value={formData.date} onChange={handleChange} />
-        </div>
-
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Number of Items: </label>
+          <label>Name:</label>
           <input
-            type="number"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div style={{ marginBottom: "1rem" }}>
+          <label>Email:</label>
+          <input
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div style={{ marginBottom: "1rem" }}>
+          <label>Date:</label>
+          <input
+            name="date"
+            type="date"
+            value={formData.date}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div style={{ marginBottom: "1rem" }}>
+          <label>Time Slot:</label>
+          <select name="time" value={formData.time} onChange={handleChange} required>
+            <option value="">Select Time</option>
+            <option value="10:30 AM">10:30 AM</option>
+            <option value="11:30 AM">11:30 AM</option>
+            <option value="12:30 PM">12:30 PM</option>
+            <option value="1:30 PM">1:30 PM</option>
+            <option value="2:30 PM">2:30 PM</option>
+            <option value="3:30 PM">3:30 PM</option>
+          </select>
+        </div>
+
+        <div style={{ marginBottom: "1rem" }}>
+          <label>Number of Items:</label>
+          <input
             name="items"
-            min="1"
+            type="number"
             value={formData.items}
             onChange={handleChange}
+            required
+            min="1"
+            max="80"
           />
         </div>
 
         <button type="submit">Book Now</button>
       </form>
+
+      {confirmation && (
+        <div style={{ marginTop: "1rem", color: "green" }}>{confirmation}</div>
+      )}
     </div>
   );
 };
