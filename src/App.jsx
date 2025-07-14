@@ -1,7 +1,7 @@
 import React from "react";
 import AdminView from "./Components/AdminView";
 import BookingForm from "./Components/BookingForm";
-import CalendarView from "./components/CalendarView";
+import CalendarView from "./Components/CalendarView";
 
 function App() {
   return (
