@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 
 const BookingForm = () => {
-  const [formData, setFormData] = useState({
   const [nameQuery, setNameQuery] = useState("");
   const [emailQuery, setEmailQuery] = useState("");
   const [matchedBookings, setMatchedBookings] = useState([]);
+
+const [formData, setFormData] = useState({
     name: "",
     email: "",
     date: "",
     time: "",
     items: "",
   });
+
   const [confirmation, setConfirmation] = useState("");
 
   const handleChange = (e) => {
