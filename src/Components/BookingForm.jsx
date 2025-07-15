@@ -2,6 +2,9 @@ import React, { useState } from "react";
 
 const BookingForm = () => {
   const [formData, setFormData] = useState({
+  const [nameQuery, setNameQuery] = useState("");
+  const [emailQuery, setEmailQuery] = useState("");
+  const [matchedBookings, setMatchedBookings] = useState([]);
     name: "",
     email: "",
     date: "",
@@ -113,6 +116,33 @@ const BookingForm = () => {
         <button type="submit">Book Now</button>
       </form>
 
+       <h2>Lookup or Cancel Booking</h2>
+<input
+  type="text"
+  placeholder="Name"
+  value={nameQuery}
+  onChange={(e) => setNameQuery(e.target.value)}
+/>
+<input
+  type="email"
+  placeholder="Email"
+  value={emailQuery}
+  onChange={(e) => setEmailQuery(e.target.value)}
+/>
+<button onClick={handleLookup}>Find My Bookings</button>
+
+{matchedBookings.length > 0 && (
+  <ul>
+    {matchedBookings.map((booking, index) => (
+      <li key={index}>
+        {booking.date} at {booking.time} – {booking.items} item(s)
+        <button onClick={() => handleCancel(booking)}>Cancel</button>
+      </li>
+    ))}
+  </ul>
+)}
+
+)}
       {confirmation && (
         <div style={{ marginTop: "1rem", color: "green" }}>{confirmation}</div>
       )}
