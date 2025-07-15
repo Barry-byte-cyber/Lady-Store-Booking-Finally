@@ -143,8 +143,6 @@ const [formData, setFormData] = useState({
     ))}
   </ul>
 )}
-
-)}
       {confirmation && (
         <div style={{ marginTop: "1rem", color: "green" }}>{confirmation}</div>
       )}
