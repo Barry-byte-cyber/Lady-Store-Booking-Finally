@@ -52,7 +52,17 @@ const [formData, setFormData] = useState({
       items: "",
     });
   };
+const handleLookup = () => {
+  const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+  const matches = bookings.filter(
+    (b) => b.name === nameQuery && b.email === emailQuery
+  );
+  setMatchedBookings(matches);
 
+  if (matches.length === 0) {
+    setConfirmation("No matching bookings found.");
+  }
+};
   return (
     <div>
       <h2>Lady Pant Store Booking</h2>
