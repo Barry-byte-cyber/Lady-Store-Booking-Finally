@@ -1,42 +1,39 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 const AdminView = () => {
-  const [bookings, setBookings] = useState([]);
+  const isAdmin = new URLSearchParams(window.location.search).get("admin") === "true";
 
-  useEffect(() => {
-    const storedBookings = JSON.parse(localStorage.getItem("bookings")) || [];
-    setBookings(storedBookings);
-  }, []);
+  if (!isAdmin) {
+    return <p style={{ padding: "1rem" }}>Access Denied. Admins only.</p>;
+  }
+
+  const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>All Bookings (Admin View)</h2>
-      {bookings.length === 0 ? (
-        <p>No bookings available.</p>
-      ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={{ borderBottom: "1px solid #ccc", padding: "0.5rem" }}>Name</th>
-              <th style={{ borderBottom: "1px solid #ccc", padding: "0.5rem" }}>Email</th>
-              <th style={{ borderBottom: "1px solid #ccc", padding: "0.5rem" }}>Date</th>
-              <th style={{ borderBottom: "1px solid #ccc", padding: "0.5rem" }}>Time</th>
-              <th style={{ borderBottom: "1px solid #ccc", padding: "0.5rem" }}>Items</th>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Admin View – All Bookings</h2>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr>
+            <th className="border px-2 py-1">Name</th>
+            <th className="border px-2 py-1">Email</th>
+            <th className="border px-2 py-1">Date</th>
+            <th className="border px-2 py-1">Time</th>
+            <th className="border px-2 py-1">Items</th>
+          </tr>
+        </thead>
+        <tbody>
+          {bookings.map((b, index) => (
+            <tr key={index}>
+              <td className="border px-2 py-1">{b.name}</td>
+              <td className="border px-2 py-1">{b.email}</td>
+              <td className="border px-2 py-1">{b.date}</td>
+              <td className="border px-2 py-1">{b.time}</td>
+              <td className="border px-2 py-1">{b.items}</td>
             </tr>
-          </thead>
-          <tbody>
-            {bookings.map((booking, index) => (
-              <tr key={index}>
-                <td style={{ padding: "0.5rem" }}>{booking.name}</td>
-                <td style={{ padding: "0.5rem" }}>{booking.email}</td>
-                <td style={{ padding: "0.5rem" }}>{booking.date}</td>
-                <td style={{ padding: "0.5rem" }}>{booking.time}</td>
-                <td style={{ padding: "0.5rem" }}>{booking.items}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
