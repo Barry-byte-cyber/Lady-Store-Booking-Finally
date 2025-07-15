@@ -63,6 +63,24 @@ const handleLookup = () => {
     setConfirmation("No matching bookings found.");
   }
 };
+
+const handleCancel = (bookingToCancel) => {
+  const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+
+  const updatedBookings = bookings.filter(
+    (b) => b.timestamp !== bookingToCancel.timestamp
+  );
+
+  if (updatedBookings.length === bookings.length) {
+    alert("Booking not found.");
+    return;
+  }
+
+  localStorage.setItem("bookings", JSON.stringify(updatedBookings));
+  setMatchedBookings(updatedBookings);
+  setConfirmation("Booking cancelled successfully.");
+};
+
   return (
     <div>
       <h2>Lady Pant Store Booking</h2>
