@@ -1,96 +1,67 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-const CalendarView = () => {
-  const [bookings, setBookings] = useState([]);
+const CalendarView = ({ onDateClick }) => {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth(); // 0-indexed
+  const currentDate = today.getDate();
 
-  useEffect(() => {
-    const stored = localStorage.getItem("bookings");
-    if (stored) {
-      setBookings(JSON.parse(stored));
-    }
-  }, []);
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-  const countItemsByDate = () => {
-    const counts = {};
-    bookings.forEach((booking) => {
-      const date = booking.date;
-      const items = parseInt(booking.items, 10) || 0;
-      counts[date] = (counts[date] || 0) + items;
-    });
-    return counts;
-  };
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay(); // 0=Sun, 1=Mon...
+  const calendar = [];
 
-  const isDayFullyBooked = (dateStr, counts) => {
-    return (counts[dateStr] || 0) >= 80;
-  };
+  // Start with empty cells if the month doesn't start on Monday
+  const offset = (firstDay + 6) % 7;
+  for (let i = 0; i < offset; i++) {
+    calendar.push(null);
+  }
 
-  const generateCalendar = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const counts = countItemsByDate();
-    const months = Array.from({ length: 12 }, (_, i) => i); // 0 to 11
+  for (let i = 1; i <= daysInMonth; i++) {
+    calendar.push(i);
+  }
 
-    return months.map((month) => {
-      const firstDay = new Date(year, month, 1);
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const startWeekday = firstDay.getDay();
-      const rows = [];
-      let cells = [];
-
-      // Fill empty cells before the first of the month
-      for (let i = 0; i < startWeekday; i++) {
-        cells.push(<td key={`empty-${i}`}></td>);
-      }
-
-      for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-        const isFull = isDayFullyBooked(dateStr, counts);
-        const itemCount = counts[dateStr] || 0;
-
-        cells.push(
-          <td
-            key={day}
-            style={{
-              backgroundColor: isFull ? "#007BFF" : "#e0ffe0",
-              color: isFull ? "white" : "black",
-              textAlign: "center",
-              padding: "4px",
-              borderRadius: "6px",
-            }}
-          >
-            {day}
-            <br />
-            <small>{itemCount}/80</small>
-          </td>
-        );
-
-        if ((cells.length) % 7 === 0 || day === daysInMonth) {
-          rows.push(<tr key={`row-${day}`}>{cells}</tr>);
-          cells = [];
-        }
-      }
-
-      return (
-        <div key={month} style={{ marginBottom: "32px", minWidth: "300px" }}>
-          <h4 style={{ textAlign: "center" }}>{new Date(year, month).toLocaleString("default", { month: "long" })}</h4>
-          <table style={{ width: "100%", borderSpacing: "4px" }}>
-            <thead>
-              <tr>
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-                  <th key={d}>{d}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>{rows}</tbody>
-          </table>
-        </div>
-      );
-    });
-  };
+  const weeks = [];
+  for (let i = 0; i < calendar.length; i += 7) {
+    weeks.push(calendar.slice(i, i + 7));
+  }
 
   return (
-    <div style={{ padding: "1rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px" }}>
-      {generateCalendar()}
+    <div>
+      <h2 className="text-xl font-bold mb-4">Bookings Calendar</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>
+          </tr>
+        </thead>
+        <tbody>
+          {weeks.map((week, wi) => (
+            <tr key={wi}>
+              {week.map((date, di) => (
+                <td key={di} style={{ padding: "6px" }}>
+                  {date ? (
+                    <button
+                      onClick={() => onDateClick && onDateClick(date)}
+                      style={{
+                        border: "1px solid gray",
+                        padding: "4px 8px",
+                        cursor: "pointer",
+                        backgroundColor:
+                          date === currentDate ? "#add8e6" : "white",
+                      }}
+                    >
+                      {date}
+                    </button>
+                  ) : (
+                    <div style={{ width: "32px", height: "32px" }} />
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
