@@ -12,33 +12,34 @@ const Login = () => {
       localStorage.setItem("isAuthenticated", "true");
       navigate("/admin");
     } else {
-      alert("Incorrect credentials");
+      alert("Invalid credentials");
     }
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>Admin Login</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Username:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
+    <div className="p-4 max-w-md mx-auto mt-10 bg-white shadow-lg rounded">
+      <h2 className="text-xl font-bold mb-4">Admin Login</h2>
+      <form onSubmit={handleLogin} className="space-y-4">
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        >
+          Login
+        </button>
       </form>
     </div>
   );
