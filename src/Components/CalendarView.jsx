@@ -4,44 +4,63 @@ import "./CalendarView.css";
 const CalendarView = ({ onDateClick }) => {
   const today = new Date();
   const year = today.getFullYear();
-  const month = today.getMonth();
 
-  const firstDayOfMonth = new Date(year, month, 1);
-  const lastDayOfMonth = new Date(year, month + 1, 0);
+  const months = Array.from({ length: 12 }, (_, i) => {
+    const firstDay = new Date(year, i, 1);
+    const daysInMonth = new Date(year, i + 1, 0).getDate();
 
-  const daysInMonth = lastDayOfMonth.getDate();
-  const startDay = firstDayOfMonth.getDay(); // 0 (Sun) - 6 (Sat)
+    const monthDays = [];
+    const startDay = firstDay.getDay(); // 0 = Sunday
 
-  const dates = [];
+    for (let x = 0; x < startDay; x++) {
+      monthDays.push(null);
+    }
 
-  // Fill in blanks for days before 1st
-  for (let i = 0; i < startDay; i++) {
-    dates.push(null);
-  }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, i, day);
+      monthDays.push(date);
+    }
 
-  // Add actual days
-  for (let day = 1; day <= daysInMonth; day++) {
-    dates.push(new Date(year, month, day));
-  }
+    return { month: i, days: monthDays };
+  });
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
-    <div className="calendar-container">
-      <h2 className="calendar-title">Bookings Calendar</h2>
-      <div className="calendar-grid">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-          <div key={d} className="calendar-header">{d}</div>
-        ))}
-
-        {dates.map((date, i) => (
-          <div
-            key={i}
-            className={`calendar-cell ${date ? "clickable" : "empty"}`}
-            onClick={() => date && onDateClick && onDateClick(date.toISOString().split("T")[0])}
-          >
-            {date ? date.getDate() : ""}
+    <div className="calendar-grid">
+      {months.map(({ month, days }) => (
+        <div key={month} className="month-container">
+          <h3>{monthNames[month]}</h3>
+          <div className="weekday-row">
+            {weekDays.map((day) => (
+              <div key={day} className="day-header">{day}</div>
+            ))}
           </div>
-        ))}
-      </div>
+          <div className="days-grid">
+            {days.map((date, idx) => (
+              <div key={idx} className="day-cell">
+                {date ? (
+                  <button
+                    onClick={() =>
+                      onDateClick && onDateClick(date.toISOString().split("T")[0])
+                    }
+                    className="calendar-day-btn"
+                  >
+                    {date.getDate()}
+                  </button>
+                ) : (
+                  <div className="empty-cell" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
