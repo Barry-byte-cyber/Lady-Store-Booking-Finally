@@ -1,66 +1,82 @@
 import React from "react";
 import "./CalendarView.css";
 
-const CalendarView = ({ onDateClick }) => {
+const CalendarView = ({ bookings = [], onDateClick, showFullYear = false }) => {
   const today = new Date();
-  const year = today.getFullYear();
+  const currentYear = today.getFullYear();
 
-  const months = Array.from({ length: 12 }, (_, i) => {
-    const firstDay = new Date(year, i, 1);
-    const daysInMonth = new Date(year, i + 1, 0).getDate();
+  const getDaysInMonth = (year, month) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
 
-    const monthDays = [];
-    const startDay = firstDay.getDay(); // 0 = Sunday
+  const getFirstDayOfMonth = (year, month) => {
+    return new Date(year, month, 1).getDay();
+  };
 
-    for (let x = 0; x < startDay; x++) {
-      monthDays.push(null);
-    }
+  const isBooked = (date) => {
+    return bookings.some(
+      (booking) => new Date(booking.date).toDateString() === date.toDateString()
+    );
+  };
+
+  const renderMonth = (monthIndex) => {
+    const monthName = new Date(currentYear, monthIndex).toLocaleString("default", {
+      month: "long",
+    });
+
+    const daysInMonth = getDaysInMonth(currentYear, monthIndex);
+    const firstDay = getFirstDayOfMonth(currentYear, monthIndex);
+
+    const weeks = [];
+    let week = new Array(firstDay).fill(null);
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(year, i, day);
-      monthDays.push(date);
+      week.push(day);
+      if (week.length === 7) {
+        weeks.push(week);
+        week = [];
+      }
+    }
+    if (week.length > 0) {
+      while (week.length < 7) {
+        week.push(null);
+      }
+      weeks.push(week);
     }
 
-    return { month: i, days: monthDays };
-  });
+    return (
+      <div className="month" key={monthName}>
+        <h4>{monthName}</h4>
+        <div className="calendar-grid">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+            <div className="calendar-day header" key={day}>
+              {day}
+            </div>
+          ))}
+          {weeks.flat().map((day, i) => {
+            const date = new Date(currentYear, monthIndex, day);
+            const isActive = day && isBooked(date);
 
-  const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+            return (
+              <div
+                key={i}
+                className={`calendar-day ${isActive ? "booked" : ""} ${day ? "" : "empty"}`}
+                onClick={() => day && onDateClick && onDateClick(date)}
+              >
+                {day || ""}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="calendar-grid">
-      {months.map(({ month, days }) => (
-        <div key={month} className="month-container">
-          <h3>{monthNames[month]}</h3>
-          <div className="weekday-row">
-            {weekDays.map((day) => (
-              <div key={day} className="day-header">{day}</div>
-            ))}
-          </div>
-          <div className="days-grid">
-            {days.map((date, idx) => (
-              <div key={idx} className="day-cell">
-                {date ? (
-                  <button
-                    onClick={() =>
-                      onDateClick && onDateClick(date.toISOString().split("T")[0])
-                    }
-                    className="calendar-day-btn"
-                  >
-                    {date.getDate()}
-                  </button>
-                ) : (
-                  <div className="empty-cell" />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
+    <div className={`calendar-container ${showFullYear ? "year-view" : ""}`}>
+      {showFullYear
+        ? Array.from({ length: 12 }, (_, i) => renderMonth(i))
+        : renderMonth(today.getMonth())}
     </div>
   );
 };

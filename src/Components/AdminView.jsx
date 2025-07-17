@@ -1,61 +1,46 @@
 import React, { useState } from "react";
-import CalendarView from "./CalendarView";
-import { useNavigate } from "react-router-dom";
+import CalendarView from "../components/CalendarView";
+import { getBookingsForDate } from "../utils";
 
-const AdminView = () => {
+const AdminView = ({ bookings, onLogout }) => {
   const [selectedDate, setSelectedDate] = useState(null);
-  const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
-    navigate("/admin");
-  };
-
-  const filteredBookings = selectedDate
-    ? bookings.filter((b) => b.date === selectedDate)
-    : [];
+  const bookingsForDate = selectedDate ? getBookingsForDate(bookings, selectedDate) : [];
 
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Admin View – Bookings Calendar</h2>
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-        >
-          Logout
-        </button>
-      </div>
+      <h2 className="text-2xl font-bold mb-4">Admin View – Bookings Calendar</h2>
+      <button onClick={onLogout} className="mb-4 px-3 py-1 border rounded">
+        Logout
+      </button>
 
-      <div className="mb-6">
-  <h3 className="text-xl font-semibold mb-2">Bookings Calendar</h3>
-  <CalendarView
-    onDateClick={(date) => setSelectedDate(date)}
-  />
-</div>
+      <h3 className="text-xl font-semibold mb-2">Bookings Calendar</h3>
+      <CalendarView
+        bookings={bookings}
+        onDateClick={(date) => setSelectedDate(date)}
+        showFullYear={true}
+      />
 
       {selectedDate && (
-        <div>
-          <h4 className="text-lg font-semibold mt-4">
-            Bookings for {selectedDate}:
+        <div className="mt-6">
+          <h4 className="text-lg font-semibold mb-2">
+            Bookings for {selectedDate.toISOString().split("T")[0]}:
           </h4>
-          <table className="mt-2 w-full border">
+          <table className="min-w-full text-sm border border-collapse border-gray-300">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="border px-2">Name</th>
-                <th className="border px-2">Email</th>
-                <th className="border px-2">Time</th>
-                <th className="border px-2">Items</th>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Time</th>
+                <th>Items</th>
               </tr>
             </thead>
             <tbody>
-              {filteredBookings.map((b, i) => (
-                <tr key={i} className="text-center">
-                  <td className="border px-2">{b.name}</td>
-                  <td className="border px-2">{b.email}</td>
-                  <td className="border px-2">{b.time}</td>
-                  <td className="border px-2">{b.items}</td>
+              {bookingsForDate.map((booking, index) => (
+                <tr key={index}>
+                  <td>{booking.name}</td>
+                  <td>{booking.email}</td>
+                  <td>{booking.time}</td>
+                  <td>{booking.quantity}</td>
                 </tr>
               ))}
             </tbody>

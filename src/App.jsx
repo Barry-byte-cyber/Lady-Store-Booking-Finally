@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import BookingForm from "./Components/BookingForm";
-import Lookup from "./Components/Lookup";
-import CalendarView from "./Components/CalendarView";
-import AdminView from "./Components/AdminView";
+import BookingForm from "./components/BookingForm";
+import Lookup from "./components/Lookup";
+import CalendarView from "./components/CalendarView";
+import AdminView from "./components/AdminView";
 
 function App() {
   const [bookings, setBookings] = useState([]);

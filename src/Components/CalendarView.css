@@ -1,10 +1,13 @@
 .calendar-container {
-  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
 }
 
-.calendar-title {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+.month {
+  width: 260px;
+  margin-bottom: 2rem;
 }
 
 .calendar-grid {
@@ -13,20 +16,29 @@
   gap: 4px;
 }
 
-.calendar-header {
-  font-weight: bold;
-  text-align: center;
-}
-
-.calendar-cell {
-  text-align: center;
+.calendar-day {
   padding: 6px;
+  text-align: center;
   border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
   cursor: pointer;
-  min-height: 30px;
+  font-size: 0.9rem;
 }
 
-.calendar-cell.empty {
+.calendar-day.booked {
+  background-color: #ffe0e0;
+  font-weight: bold;
+}
+
+.calendar-day.header {
+  font-weight: bold;
+  background-color: #f0f0f0;
+  cursor: default;
+}
+
+.calendar-day.empty {
+  background-color: transparent;
   border: none;
   cursor: default;
 }
