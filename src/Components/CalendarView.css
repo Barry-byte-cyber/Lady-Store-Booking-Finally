@@ -1,4 +1,32 @@
-td button {
-  padding: 0.5rem;
-  width: 100%;
+.calendar-container {
+  margin-top: 1rem;
+}
+
+.calendar-title {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-header {
+  font-weight: bold;
+  text-align: center;
+}
+
+.calendar-cell {
+  text-align: center;
+  padding: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  min-height: 30px;
+}
+
+.calendar-cell.empty {
+  border: none;
+  cursor: default;
 }
