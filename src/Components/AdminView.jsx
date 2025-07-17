@@ -29,12 +29,11 @@ const AdminView = () => {
       </div>
 
       <div className="mb-6">
-        <h3 className="text-xl font-semibold mb-2">Bookings Calendar</h3>
-        <CalendarView
-          onDateClick={(date) => setSelectedDate(date)}
-          showFullYear={true}
-        />
-      </div>
+  <h3 className="text-xl font-semibold mb-2">Bookings Calendar</h3>
+  <CalendarView
+    onDateClick={(date) => setSelectedDate(date)}
+  />
+</div>
 
       {selectedDate && (
         <div>
