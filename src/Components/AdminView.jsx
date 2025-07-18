@@ -1,46 +1,44 @@
 import React, { useState } from "react";
-import CalendarView from "../components/CalendarView";
-import { getBookingsForDate } from "../utils";
+import CalendarView from "./CalendarView";
 
-const AdminView = ({ bookings, onLogout }) => {
+function AdminView() {
   const [selectedDate, setSelectedDate] = useState(null);
-  const bookingsForDate = selectedDate ? getBookingsForDate(bookings, selectedDate) : [];
+  const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+
+  const bookingsForSelectedDate = bookings.filter(
+    (booking) => booking.date === selectedDate
+  );
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("isAdmin");
+    window.location.reload();
+  };
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Admin View – Bookings Calendar</h2>
-      <button onClick={onLogout} className="mb-4 px-3 py-1 border rounded">
-        Logout
-      </button>
-
-      <h3 className="text-xl font-semibold mb-2">Bookings Calendar</h3>
+    <div>
+      <h2>Admin View – Bookings Calendar</h2>
+      <button onClick={handleLogout}>Logout</button>
       <CalendarView
         bookings={bookings}
-        onDateClick={(date) => setSelectedDate(date)}
+        onDateClick={setSelectedDate}
         showFullYear={true}
       />
-
       {selectedDate && (
-        <div className="mt-6">
-          <h4 className="text-lg font-semibold mb-2">
-            Bookings for {selectedDate.toISOString().split("T")[0]}:
-          </h4>
-          <table className="min-w-full text-sm border border-collapse border-gray-300">
+        <div>
+          <h3>Bookings for {selectedDate}:</h3>
+          <table>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Time</th>
-                <th>Items</th>
+                <th>Name</th><th>Email</th><th>Time</th><th>Items</th>
               </tr>
             </thead>
             <tbody>
-              {bookingsForDate.map((booking, index) => (
+              {bookingsForSelectedDate.map((booking, index) => (
                 <tr key={index}>
                   <td>{booking.name}</td>
                   <td>{booking.email}</td>
                   <td>{booking.time}</td>
-                  <td>{booking.quantity}</td>
+                  <td>{booking.items}</td>
                 </tr>
               ))}
             </tbody>
@@ -49,6 +47,6 @@ const AdminView = ({ bookings, onLogout }) => {
       )}
     </div>
   );
-};
+}
 
 export default AdminView;
