@@ -4,6 +4,8 @@ import AdminView from "./components/AdminView";
 import Login from "./components/Login";
 
 function App() {
+  console.log("Force rebuild");
+
   const params = new URLSearchParams(window.location.search);
   const isAdmin = params.get("admin") === "true";
 
