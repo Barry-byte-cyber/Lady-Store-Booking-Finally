@@ -1,7 +1,7 @@
 import React from "react";
-import "./CalendarView.css";
+import "./calendarview.css";
 
-const CalendarView = ({ bookings = [], onDateClick, showFullYear = false }) => {
+const calendarview = ({ bookings = [], onDateClick, showFullYear = false }) => {
   const today = new Date();
   const currentYear = today.getFullYear();
 
@@ -81,4 +81,4 @@ const CalendarView = ({ bookings = [], onDateClick, showFullYear = false }) => {
   );
 };
 
-export default CalendarView;
+export default calendarview;

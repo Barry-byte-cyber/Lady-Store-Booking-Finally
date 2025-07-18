@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import CalendarView from "../components/CalendarView";
+import CalendarView from "../components/calendarview";
 import { getBookingsForDate } from "../utils";
 
 const AdminView = ({ bookings, onLogout }) => {

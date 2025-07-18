@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
-const BookingForm = () => {
+const bookingform = () => {
   const [nameQuery, setNameQuery] = useState("");
   const [emailQuery, setEmailQuery] = useState("");
-  const [matchedBookings, setMatchedBookings] = useState([]);
+  const [matchedbookings, setMatchedbookings] = useState([]);
 
 const [formData, setFormData] = useState({
     name: "",
@@ -39,7 +39,7 @@ const [formData, setFormData] = useState({
       return;
     }
 
-    bookings.push(newBooking);
+    bookings.push(newbooking);
     localStorage.setItem("bookings", JSON.stringify(bookings));
     setConfirmation(
       `Booking confirmed for ${formData.name} on ${formData.date} at ${formData.time} for ${formData.items} items.`
@@ -67,7 +67,7 @@ const handleLookup = () => {
 const handleCancel = (bookingToCancel) => {
   const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
 
-  const updatedBookings = bookings.filter(
+  const updatedbookings = bookings.filter(
     (b) => b.timestamp !== bookingToCancel.timestamp
   );
 
@@ -77,8 +77,8 @@ const handleCancel = (bookingToCancel) => {
   }
 
   localStorage.setItem("bookings", JSON.stringify(updatedBookings));
-  setMatchedBookings(updatedBookings);
-  setConfirmation("Booking cancelled successfully.");
+  setMatchedbookings(updatedbookings);
+  setConfirmation("booking cancelled successfully.");
 };
 
   return (
@@ -146,7 +146,7 @@ const handleCancel = (bookingToCancel) => {
         <button type="submit">Book Now</button>
       </form>
 
-       <h2>Lookup or Cancel Booking</h2>
+       <h2>Lookup or Cancel booking</h2>
 <input
   type="text"
   placeholder="Name"
@@ -159,11 +159,11 @@ const handleCancel = (bookingToCancel) => {
   value={emailQuery}
   onChange={(e) => setEmailQuery(e.target.value)}
 />
-<button onClick={handleLookup}>Find My Bookings</button>
+<button onClick={handleLookup}>Find My bookings</button>
 
 {matchedBookings.length > 0 && (
   <ul>
-    {matchedBookings.map((booking, index) => (
+    {matchedbookings.map((booking, index) => (
       <li key={index}>
         {booking.date} at {booking.time} – {booking.items} item(s)
         <button onClick={() => handleCancel(booking)}>Cancel</button>
@@ -178,4 +178,4 @@ const handleCancel = (bookingToCancel) => {
   );
 };
 
-export default BookingForm;
+export default bookingform;

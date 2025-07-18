@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import BookingForm from "./components/BookingForm";
-import Lookup from "./components/Lookup";
-import CalendarView from "./components/CalendarView";
-import AdminView from "./components/AdminView";
+import bookingform from "./components/bookingform";
+import lookup from "./components/lookup";
+import calendarview from "./components/calendarview";
+import adminview from "./components/adminview";
 
 function App() {
   const [bookings, setBookings] = useState([]);
@@ -40,13 +40,13 @@ function App() {
       ) : (
         <>
           <h1 className="text-2xl font-bold mb-4">Lady Pant Store Booking</h1>
-          <BookingForm onBooking={handleBooking} />
-          <Lookup bookings={bookings} onCancel={handleCancel} />
-          <CalendarView bookings={bookings} showFullYear={true} />
+          <bookingform onBooking={handleBooking} />
+          <lookup bookings={bookings} onCancel={handleCancel} />
+          <calendarview bookings={bookings} showFullYear={true} />
         </>
       )}
     </div>
   );
 }
 
-export default App;
+export default app;
