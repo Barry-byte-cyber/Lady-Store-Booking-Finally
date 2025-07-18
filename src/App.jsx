@@ -1,49 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import BookingForm from "./components/BookingForm";
-import Lookup from "./components/Lookup";
-import CalendarView from "./components/CalendarView";
 import AdminView from "./components/AdminView";
+import Login from "./components/Login";
 
 function App() {
-  const [bookings, setBookings] = useState([]);
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    const storedBookings = localStorage.getItem("bookings");
-    if (storedBookings) {
-      setBookings(JSON.parse(storedBookings));
-    }
-
-    const queryParams = new URLSearchParams(window.location.search);
-    const adminParam = queryParams.get("admin");
-    setIsAdmin(adminParam === "true");
-  }, []);
-
-  const handleBooking = (newBooking) => {
-    const updatedBookings = [...bookings, newBooking];
-    setBookings(updatedBookings);
-    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
-  };
-
-  const handleCancel = (email, name) => {
-    const updatedBookings = bookings.filter(
-      (b) => !(b.email === email && b.name === name)
-    );
-    setBookings(updatedBookings);
-    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
-  };
+  const params = new URLSearchParams(window.location.search);
+  const isAdmin = params.get("admin") === "true";
 
   return (
-    <div className="container mx-auto p-4">
-      {isadmin ? (
-        <adminview bookings={bookings} />
+    <div>
+      {isAdmin ? (
+        sessionStorage.getItem("isAdmin") === "true" ? (
+          <AdminView />
+        ) : (
+          <Login />
+        )
       ) : (
-        <>
-          <h1 className="text-2xl font-bold mb-4">Lady Pant Store Booking</h1>
-          <BookingForm onBooking={handleBooking} />
-          <lookup bookings={bookings} onCancel={handleCancel} />
-          <calendarview bookings={bookings} showFullYear={true} />
-        </>
+        <BookingForm />
       )}
     </div>
   );

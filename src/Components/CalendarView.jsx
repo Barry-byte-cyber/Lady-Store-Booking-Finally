@@ -1,84 +1,58 @@
 import React from "react";
-import "./calendarview.css";
+import "./CalendarView.css";
 
-const calendarview = ({ bookings = [], onDateClick, showFullYear = false }) => {
+function CalendarView({ bookings, onDateClick, showFullYear }) {
+  const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const today = new Date();
-  const currentYear = today.getFullYear();
+  const year = today.getFullYear();
 
-  const getDaysInMonth = (year, month) => {
-    return new Date(year, month + 1, 0).getDate();
-  };
+  const renderMonth = (month) => {
+    const days = daysInMonth(year, month);
+    const start = new Date(year, month, 1).getDay();
+    const cells = [];
 
-  const getFirstDayOfMonth = (year, month) => {
-    return new Date(year, month, 1).getDay();
-  };
-
-  const isBooked = (date) => {
-    return bookings.some(
-      (booking) => new Date(booking.date).toDateString() === date.toDateString()
-    );
-  };
-
-  const renderMonth = (monthIndex) => {
-    const monthName = new Date(currentYear, monthIndex).toLocaleString("default", {
-      month: "long",
-    });
-
-    const daysInMonth = getDaysInMonth(currentYear, monthIndex);
-    const firstDay = getFirstDayOfMonth(currentYear, monthIndex);
-
-    const weeks = [];
-    let week = new Array(firstDay).fill(null);
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      week.push(day);
-      if (week.length === 7) {
-        weeks.push(week);
-        week = [];
-      }
+    for (let i = 0; i < start; i++) {
+      cells.push(<td key={`empty-${i}`}></td>);
     }
-    if (week.length > 0) {
-      while (week.length < 7) {
-        week.push(null);
-      }
-      weeks.push(week);
+
+    for (let day = 1; day <= days; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+      const bookedItems = bookings
+        .filter((b) => b.date === dateStr)
+        .reduce((sum, b) => sum + parseInt(b.items), 0);
+
+      cells.push(
+        <td
+          key={day}
+          className={bookedItems > 0 ? "booked" : ""}
+          onClick={() => onDateClick && onDateClick(dateStr)}
+        >
+          {day}
+        </td>
+      );
+    }
+
+    const rows = [];
+    for (let i = 0; i < cells.length; i += 7) {
+      rows.push(<tr key={i}>{cells.slice(i, i + 7)}</tr>);
     }
 
     return (
-      <div className="month" key={monthName}>
-        <h4>{monthName}</h4>
-        <div className="calendar-grid">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-            <div className="calendar-day header" key={day}>
-              {day}
-            </div>
-          ))}
-          {weeks.flat().map((day, i) => {
-            const date = new Date(currentYear, monthIndex, day);
-            const isActive = day && isBooked(date);
-
-            return (
-              <div
-                key={i}
-                className={`calendar-day ${isActive ? "booked" : ""} ${day ? "" : "empty"}`}
-                onClick={() => day && onDateClick && onDateClick(date)}
-              >
-                {day || ""}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <table key={month}>
+        <thead>
+          <tr>
+            <th colSpan="7">
+              {new Date(year, month).toLocaleString("default", { month: "long" })}
+            </th>
+          </tr>
+          <tr><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>
+        </thead>
+        <tbody>{rows}</tbody>
+      </table>
     );
   };
 
-  return (
-    <div className={`calendar-container ${showFullYear ? "year-view" : ""}`}>
-      {showFullYear
-        ? Array.from({ length: 12 }, (_, i) => renderMonth(i))
-        : renderMonth(today.getMonth())}
-    </div>
-  );
-};
+  return <div className="calendar-container">{Array.from({ length: showFullYear ? 12 : 1 }, (_, i) => renderMonth(i))}</div>;
+}
 
-export default calendarview;
+export default CalendarView;
