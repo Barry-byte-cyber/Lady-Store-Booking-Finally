@@ -1,52 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CalendarView from "./CalendarView";
 
-function AdminView() {
+const AdminView = () => {
+  const [bookingsByDate, setBookingsByDate] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
-  const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
 
-  const bookingsForSelectedDate = bookings.filter(
-    (booking) => booking.date === selectedDate
-  );
+  useEffect(() => {
+    const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    const grouped = bookings.reduce((acc, booking) => {
+      if (!acc[booking.date]) acc[booking.date] = [];
+      acc[booking.date].push(booking);
+      return acc;
+    }, {});
+    setBookingsByDate(grouped);
+  }, []);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("isAdmin");
-    window.location.reload();
+  const handleDateClick = (date) => {
+    setSelectedDate(date);
   };
 
   return (
-    <div>
-      <h2>Admin View – Bookings Calendar</h2>
-      <button onClick={handleLogout}>Logout</button>
+    <div style={{ padding: "20px" }}>
+      <h2>Admin Booking Overview</h2>
       <CalendarView
-        bookings={bookings}
-        onDateClick={setSelectedDate}
+        bookingsByDate={bookingsByDate}
+        onDateClick={handleDateClick}
         showFullYear={true}
       />
-      {selectedDate && (
-        <div>
-          <h3>Bookings for {selectedDate}:</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th><th>Email</th><th>Time</th><th>Items</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookingsForSelectedDate.map((booking, index) => (
-                <tr key={index}>
-                  <td>{booking.name}</td>
-                  <td>{booking.email}</td>
-                  <td>{booking.time}</td>
-                  <td>{booking.items}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {selectedDate && bookingsByDate[selectedDate] && (
+        <div style={{ marginTop: "30px" }}>
+          <h3>Bookings for {selectedDate}</h3>
+          <ul>
+            {bookingsByDate[selectedDate].map((b, index) => (
+              <li key={index}>
+                <strong>Name:</strong> {b.name} | <strong>Email:</strong> {b.email} |{" "}
+                <strong>Time Slot:</strong> {b.time} | <strong>Items:</strong> {b.items}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
   );
-}
+};
 
 export default AdminView;
