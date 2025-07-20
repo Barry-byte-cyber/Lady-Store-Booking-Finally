@@ -1,7 +1,7 @@
 import React from "react";
-import BookingForm from "./components/BookingForm";
-import AdminView from "./components/AdminView";
-import Login from "./components/Login";
+import BookingForm from "./Components/BookingForm";
+import AdminView from "./Components/AdminView";
+import Login from "./Components/Login";
 
 function App() {
   console.log("Force rebuild");
