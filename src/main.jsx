@@ -1,9 +1,9 @@
-// Force Vercel redeploy — July 18
+// Vercel redeploy trigger — July 19
 
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
-import "./components/BookingCalendar.css";
+import BookingCalendar from "./components/BookingCalendar";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
