@@ -1,5 +1,4 @@
 import React from "react";
-import "./CalendarView.css";
 
 function CalendarView({ onDateClick, showFullYear = false, bookingDetails = {}, selectedDate = null }) {
   const today = new Date();
@@ -22,40 +21,40 @@ function CalendarView({ onDateClick, showFullYear = false, bookingDetails = {}, 
       }
     }
     if (week.length > 0) {
+      while (week.length < 7) {
+        week.push(null);
+      }
       weeks.push(week);
     }
     return weeks;
   };
 
-  const renderCalendar = (year, month) => {
+  const renderMonth = (year, month) => {
     const weeks = generateCalendar(year, month);
     const monthName = new Date(year, month).toLocaleString("default", { month: "long" });
 
     return (
-      <div className="calendar border rounded-lg shadow p-2 w-full max-w-xs m-2">
-        <h3 className="text-center font-semibold text-lg mb-2">{monthName}</h3>
-        <div className="grid grid-cols-7 text-xs font-semibold text-center border-b pb-1">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
+      <div key={`${year}-${month}`} className="border rounded p-2 shadow m-2 w-[270px]">
+        <h3 className="text-center font-bold mb-2">{monthName}</h3>
+        <div className="grid grid-cols-7 gap-1 text-xs font-semibold text-center">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
             <div key={day}>{day}</div>
           ))}
         </div>
         {weeks.map((week, i) => (
-          <div key={i} className="grid grid-cols-7 text-sm text-center">
+          <div key={i} className="grid grid-cols-7 gap-1 text-sm text-center">
             {week.map((day, j) => {
-              const fullDate = day ? `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}` : null;
-              const hasBooking = fullDate && bookingDetails[fullDate];
-              const isSelected = selectedDate === fullDate;
+              const dateKey = day ? `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}` : null;
+              const isSelected = selectedDate === dateKey;
+              const hasBookings = bookingDetails[dateKey];
 
               return (
                 <div
                   key={j}
-                  className={`p-1 cursor-pointer border ${
-                    day ? "hover:bg-blue-100" : ""
-                  } ${isSelected ? "bg-yellow-200" : ""}`}
-                  onClick={() => day && onDateClick && onDateClick(fullDate)}
+                  className={`h-6 cursor-pointer rounded ${day ? 'hover:bg-blue-100' : ''} ${isSelected ? 'bg-blue-300' : ''} ${hasBookings ? 'font-bold text-green-600' : ''}`}
+                  onClick={() => day && onDateClick && onDateClick(dateKey)}
                 >
-                  {day || ""}
-                  {hasBooking && <div className="text-[10px] text-green-600">📦</div>}
+                  {day || ''}
                 </div>
               );
             })}
@@ -65,18 +64,18 @@ function CalendarView({ onDateClick, showFullYear = false, bookingDetails = {}, 
     );
   };
 
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth();
-
-  if (showFullYear) {
+  const renderYear = () => {
     const months = [];
-    for (let m = 0; m < 12; m++) {
-      months.push(renderCalendar(currentYear, m));
+    for (let month = 0; month < 12; month++) {
+      months.push(renderMonth(today.getFullYear(), month));
     }
-    return <div className="flex flex-wrap justify-center">{months}</div>;
-  }
 
-  return renderCalendar(currentYear, currentMonth);
+    return (
+      <div className="flex flex-wrap justify-center">
+        {months}
+      </div>
+    );
+  };
+
+  return showFullYear ? renderYear() : renderMonth(today.getFullYear(), today.getMonth());
 }
-
-export default CalendarView;
