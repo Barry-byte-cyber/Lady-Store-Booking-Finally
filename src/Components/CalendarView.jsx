@@ -20,12 +20,12 @@ function CalendarView({ onDateClick, showFullYear = false, bookingDetails = {}, 
         week = [];
       }
     }
+
     if (week.length > 0) {
-      while (week.length < 7) {
-        week.push(null);
-      }
+      while (week.length < 7) week.push(null);
       weeks.push(week);
     }
+
     return weeks;
   };
 
@@ -34,49 +34,58 @@ function CalendarView({ onDateClick, showFullYear = false, bookingDetails = {}, 
     const monthName = new Date(year, month).toLocaleString("default", { month: "long" });
 
     return (
-      <div key={`${year}-${month}`} className="border rounded p-2 shadow m-2 w-[270px]">
-        <h3 className="text-center font-bold mb-2">{monthName}</h3>
-        <div className="grid grid-cols-7 gap-1 text-xs font-semibold text-center">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day}>{day}</div>
-          ))}
+      <div key={`${year}-${month}`} className="border rounded p-2 m-2 w-full sm:w-[300px]">
+        <h3 className="text-center font-bold">{monthName}</h3>
+        <div className="grid grid-cols-7 text-xs font-semibold text-center mt-2 mb-1">
+          <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
         </div>
-        {weeks.map((week, i) => (
-          <div key={i} className="grid grid-cols-7 gap-1 text-sm text-center">
-            {week.map((day, j) => {
-              const dateKey = day ? `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}` : null;
-              const isSelected = selectedDate === dateKey;
-              const hasBookings = bookingDetails[dateKey];
+        {weeks.map((week, wi) => (
+          <div key={wi} className="grid grid-cols-7 text-center text-sm">
+            {week.map((day, di) => {
+              const dateKey = day
+                ? `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+                : null;
 
               return (
                 <div
-                  key={j}
-                  className={`h-6 cursor-pointer rounded ${day ? 'hover:bg-blue-100' : ''} ${isSelected ? 'bg-blue-300' : ''} ${hasBookings ? 'font-bold text-green-600' : ''}`}
+                  key={di}
+                  className={`p-1 border h-10 flex items-center justify-center cursor-pointer hover:bg-blue-100 ${
+                    selectedDate === dateKey ? "bg-blue-200" : ""
+                  }`}
                   onClick={() => day && onDateClick && onDateClick(dateKey)}
                 >
-                  {day || ''}
+                  {day || ""}
                 </div>
               );
             })}
           </div>
         ))}
+        {selectedDate &&
+          new Date(selectedDate).getMonth() === month &&
+          bookingDetails[selectedDate] && (
+            <div className="mt-2 text-sm bg-gray-100 p-2 rounded shadow">
+              <h4 className="font-semibold mb-1">Bookings for {selectedDate}</h4>
+              <ul className="list-disc list-inside">
+                {bookingDetails[selectedDate].map((booking, index) => (
+                  <li key={index}>
+                    {booking.name} - {booking.items} items @ {booking.time}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
       </div>
     );
   };
 
-  const renderYear = () => {
-    const months = [];
-    for (let month = 0; month < 12; month++) {
-      months.push(renderMonth(today.getFullYear(), month));
-    }
+  const currentYear = today.getFullYear();
+  const months = showFullYear ? Array.from({ length: 12 }, (_, i) => i) : [today.getMonth()];
 
-    return (
-      <div className="flex flex-wrap justify-center">
-        {months}
-      </div>
-    );
-  };
-
-  return showFullYear ? renderYear() : renderMonth(today.getFullYear(), today.getMonth());
+  return (
+    <div className="flex flex-wrap justify-center">
+      {months.map((month) => renderMonth(currentYear, month))}
+    </div>
+  );
 }
+
 export default CalendarView;
