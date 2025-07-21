@@ -1,0 +1,57 @@
+.calendar-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.calendar-month {
+  border: 1px solid #ccc;
+  padding: 16px;
+  min-width: 300px;
+  max-width: 320px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.calendar-month h3 {
+  margin: 0 0 10px;
+  font-size: 1.2em;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.calendar-day {
+  padding: 6px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.calendar-day:hover {
+  background-color: #e6f7ff;
+}
+
+.calendar-day.selected {
+  background-color: #b3e5fc;
+}
+
+.no-bookings {
+  margin-top: 10px;
+  font-style: italic;
+  color: #777;
+}

@@ -1,4 +1,5 @@
 import React from "react";
+import "./CalendarView.css";
 
 function CalendarView({ onDateClick, showFullYear = false, bookingDetails = {}, selectedDate = null }) {
   const today = new Date();
