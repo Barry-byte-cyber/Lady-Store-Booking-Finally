@@ -1,43 +1,46 @@
 import React, { useState, useEffect } from "react";
+import { getBookingsForDate } from "../utils/storage";
+import BookingDetails from "./BookingDetails";
 import CalendarView from "./CalendarView";
 
 const AdminView = () => {
-  const [bookingsByDate, setBookingsByDate] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
+  const [bookingsForDate, setBookingsForDate] = useState([]);
 
   useEffect(() => {
-    const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-    const grouped = bookings.reduce((acc, booking) => {
-      if (!acc[booking.date]) acc[booking.date] = [];
-      acc[booking.date].push(booking);
-      return acc;
-    }, {});
-    setBookingsByDate(grouped);
-  }, []);
-
-  const handleDateClick = (date) => {
-    setSelectedDate(date);
-  };
+    if (selectedDate) {
+      const bookings = getBookingsForDate(selectedDate);
+      setBookingsForDate(bookings);
+    }
+  }, [selectedDate]);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Admin Booking Overview</h2>
+    <div className="admin-view p-4">
+      <h2 className="text-2xl font-bold mb-4">Admin View</h2>
       <CalendarView
-        bookingsByDate={bookingsByDate}
-        onDateClick={handleDateClick}
+        onDateClick={(date) => setSelectedDate(date)}
         showFullYear={true}
       />
-      {selectedDate && bookingsByDate[selectedDate] && (
-        <div style={{ marginTop: "30px" }}>
-          <h3>Bookings for {selectedDate}</h3>
-          <ul>
-            {bookingsByDate[selectedDate].map((b, index) => (
-              <li key={index}>
-                <strong>Name:</strong> {b.name} | <strong>Email:</strong> {b.email} |{" "}
-                <strong>Time Slot:</strong> {b.time} | <strong>Items:</strong> {b.items}
-              </li>
-            ))}
-          </ul>
+
+      {selectedDate && (
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold mb-2">
+            Bookings for {selectedDate.toDateString()}
+          </h3>
+          {bookingsForDate.length > 0 ? (
+            <ul className="space-y-2">
+              {bookingsForDate.map((booking, index) => (
+                <li
+                  key={index}
+                  className="border p-2 rounded bg-gray-100 shadow"
+                >
+                  <BookingDetails booking={booking} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No bookings for this date.</p>
+          )}
         </div>
       )}
     </div>
