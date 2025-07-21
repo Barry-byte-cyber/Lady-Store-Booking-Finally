@@ -1,10 +1,8 @@
-export const getBookings = () => {
-  const data = localStorage.getItem("bookings");
-  return data ? JSON.parse(data) : [];
-};
-
-export const saveBooking = (booking) => {
-  const bookings = getBookings();
-  bookings.push(booking);
-  localStorage.setItem("bookings", JSON.stringify(bookings));
-};
+export function getBookings() {
+  const bookingsJSON = localStorage.getItem("bookings");
+  try {
+    return bookingsJSON ? JSON.parse(bookingsJSON) : [];
+  } catch {
+    return [];
+  }
+}

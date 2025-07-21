@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getBookingsForDate } from "../utils/storage";
+import { getBookings } from "../utils/storage";
 import BookingDetails from "./BookingDetails";
 import CalendarView from "./CalendarView";
 
@@ -9,7 +9,9 @@ const AdminView = () => {
 
   useEffect(() => {
     if (selectedDate) {
-      const bookings = getBookingsForDate(selectedDate);
+      const bookings = getBookings().filter(
+        (booking) => booking.date === selectedDate
+      );
       setBookingsForDate(bookings);
     }
   }, [selectedDate]);
@@ -21,27 +23,16 @@ const AdminView = () => {
         onDateClick={(date) => setSelectedDate(date)}
         showFullYear={true}
       />
-
-      {selectedDate && (
-        <div className="mt-6">
+      {selectedDate && bookingsForDate.length > 0 && (
+        <div className="mt-4">
           <h3 className="text-xl font-semibold mb-2">
-            Bookings for {selectedDate.toDateString()}
+            Bookings for {selectedDate}
           </h3>
-          {bookingsForDate.length > 0 ? (
-            <ul className="space-y-2">
-              {bookingsForDate.map((booking, index) => (
-                <li
-                  key={index}
-                  className="border p-2 rounded bg-gray-100 shadow"
-                >
-                  <BookingDetails booking={booking} />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No bookings for this date.</p>
-          )}
+          <BookingDetails bookings={bookingsForDate} />
         </div>
+      )}
+      {selectedDate && bookingsForDate.length === 0 && (
+        <p className="mt-4">No bookings for {selectedDate}.</p>
       )}
     </div>
   );
