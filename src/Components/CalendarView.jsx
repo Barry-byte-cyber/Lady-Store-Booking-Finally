@@ -30,50 +30,38 @@ function CalendarView({ onDateClick, showFullYear = false, bookingDetails = {}, 
   };
 
   const renderMonth = (year, month) => {
-    const weeks = generateCalendar(year, month);
     const monthName = new Date(year, month).toLocaleString("default", { month: "long" });
+    const weeks = generateCalendar(year, month);
+    const isSelectedMonth = selectedDate && selectedDate.getMonth() === month;
 
     return (
-      <div key={`${year}-${month}`} className="border rounded p-2 m-2 w-full sm:w-[300px]">
-        <h3 className="text-center font-bold">{monthName}</h3>
-        <div className="grid grid-cols-7 text-xs font-semibold text-center mt-2 mb-1">
-          <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-        </div>
-        {weeks.map((week, wi) => (
-          <div key={wi} className="grid grid-cols-7 text-center text-sm">
-            {week.map((day, di) => {
-              const dateKey = day
-                ? `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-                : null;
+      <div key={`${year}-${month}`} className="border rounded p-2 m-2 w-full sm:w-[300px] shadow">
+        <h3 className="text-center font-bold mb-2">{monthName}</h3>
+        <div className="grid grid-cols-7 gap-1 text-xs font-semibold text-center">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+            <div key={day}>{day}</div>
+          ))}
+          {weeks.map((week, wi) =>
+            week.map((day, di) => {
+              const date = day ? new Date(year, month, day) : null;
+              const isSelected = date && selectedDate && date.toDateString() === selectedDate.toDateString();
+              const bookingCount = date ? (bookingDetails[date.toISOString().split("T")[0]]?.length || 0) : 0;
 
               return (
                 <div
-                  key={di}
-                  className={`p-1 border h-10 flex items-center justify-center cursor-pointer hover:bg-blue-100 ${
-                    selectedDate === dateKey ? "bg-blue-200" : ""
+                  key={`${wi}-${di}`}
+                  className={`border h-8 flex items-center justify-center cursor-pointer rounded-sm ${
+                    isSelected ? "bg-blue-300" : ""
                   }`}
-                  onClick={() => day && onDateClick && onDateClick(dateKey)}
+                  onClick={() => date && onDateClick && onDateClick(date)}
                 >
                   {day || ""}
+                  {bookingCount > 0 && <span className="text-[10px] ml-1 text-red-500">*</span>}
                 </div>
               );
-            })}
-          </div>
-        ))}
-        {selectedDate &&
-          new Date(selectedDate).getMonth() === month &&
-          bookingDetails[selectedDate] && (
-            <div className="mt-2 text-sm bg-gray-100 p-2 rounded shadow">
-              <h4 className="font-semibold mb-1">Bookings for {selectedDate}</h4>
-              <ul className="list-disc list-inside">
-                {bookingDetails[selectedDate].map((booking, index) => (
-                  <li key={index}>
-                    {booking.name} - {booking.items} items @ {booking.time}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            })
           )}
+        </div>
       </div>
     );
   };
