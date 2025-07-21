@@ -79,3 +79,4 @@ function CalendarView({ onDateClick, showFullYear = false, bookingDetails = {}, 
 
   return showFullYear ? renderYear() : renderMonth(today.getFullYear(), today.getMonth());
 }
+export default CalendarView;
