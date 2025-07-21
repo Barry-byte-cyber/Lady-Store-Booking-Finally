@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { getBookings } from "../utils/storage";
-import BookingDetails from "./BookingDetails";
 import CalendarView from "./CalendarView";
 
-const AdminView = () => {
+function AdminView() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [bookingsForDate, setBookingsForDate] = useState([]);
+  const [allBookings, setAllBookings] = useState({});
+
+  useEffect(() => {
+    const storedBookings = getBookings();
+    setAllBookings(storedBookings);
+  }, []);
 
   useEffect(() => {
     if (selectedDate) {
-      const bookings = getBookings().filter(
-        (booking) => booking.date === selectedDate
-      );
+      const bookings = allBookings[selectedDate] || [];
       setBookingsForDate(bookings);
     }
-  }, [selectedDate]);
+  }, [selectedDate, allBookings]);
 
   return (
     <div className="admin-view p-4">
@@ -22,20 +25,11 @@ const AdminView = () => {
       <CalendarView
         onDateClick={(date) => setSelectedDate(date)}
         showFullYear={true}
+        bookingDetails={allBookings}
+        selectedDate={selectedDate}
       />
-      {selectedDate && bookingsForDate.length > 0 && (
-        <div className="mt-4">
-          <h3 className="text-xl font-semibold mb-2">
-            Bookings for {selectedDate}
-          </h3>
-          <BookingDetails bookings={bookingsForDate} />
-        </div>
-      )}
-      {selectedDate && bookingsForDate.length === 0 && (
-        <p className="mt-4">No bookings for {selectedDate}.</p>
-      )}
     </div>
   );
-};
+}
 
 export default AdminView;
