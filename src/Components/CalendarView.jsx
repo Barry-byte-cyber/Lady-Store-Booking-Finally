@@ -1,82 +1,104 @@
-import React from "react";
-import "./CalendarView.css";
+import React, { useState } from 'react';
+import './CalendarView.css';
 
-const CalendarView = ({ showFullYear = false, onDateClick, bookingDetails = {}, selectedDate }) => {
-  const today = new Date();
+const months = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
 
-  const getMonthName = (monthIndex) => {
-    return new Date(2023, monthIndex, 1).toLocaleString("default", { month: "long" });
-  };
+const CalendarView = ({ bookings, onDateClick, showFullYear = false }) => {
+  const [selectedDate, setSelectedDate] = useState(null);
+  const currentYear = new Date().getFullYear();
 
-  const getDaysInMonth = (year, month) => {
-    return new Date(year, month + 1, 0).getDate();
+  const getBookingsForDate = (dateString) => {
+    return bookings.filter(
+      (booking) => booking.date.split('T')[0] === dateString
+    );
   };
 
   const getColorClass = (count) => {
-    if (count >= 60) return "bg-red-200";
-    if (count >= 30) return "bg-yellow-200";
-    if (count > 0) return "bg-green-200";
-    return "";
+    if (count >= 60) return 'bg-red';
+    if (count >= 40) return 'bg-yellow';
+    if (count > 0) return 'bg-green';
+    return 'bg-default';
   };
 
-  const renderCalendar = (year, month) => {
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDayOfMonth = new Date(year, month, 1).getDay();
-    const rows = [];
-    let cells = [];
+  const renderMonth = (monthIndex) => {
+    const firstDay = new Date(currentYear, monthIndex, 1);
+    const lastDay = new Date(currentYear, monthIndex + 1, 0);
+    const weeks = [];
+    let days = [];
 
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      cells.push(<td key={`empty-${i}`} className="border p-2" />);
+    // Fill initial empty days
+    for (let i = 0; i < firstDay.getDay(); i++) {
+      days.push(<td key={`empty-${i}`}></td>);
     }
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateKey = new Date(year, month, day).toISOString().split("T")[0];
-      const bookings = bookingDetails[dateKey] || [];
-      const itemCount = bookings.reduce((total, b) => total + Number(b.items || 0), 0);
-      const colorClass = getColorClass(itemCount);
+    for (let date = 1; date <= lastDay.getDate(); date++) {
+      const dateObj = new Date(currentYear, monthIndex, date);
+      const dateString = dateObj.toISOString().split('T')[0];
+      const dateBookings = getBookingsForDate(dateString);
+      const itemCount = dateBookings.reduce((sum, b) => sum + parseInt(b.items), 0);
 
-      cells.push(
+      const isSelected = selectedDate === dateString;
+      days.push(
         <td
-          key={day}
-          className={`border p-2 cursor-pointer ${colorClass}`}
-          onClick={() => onDateClick && onDateClick(new Date(year, month, day))}
+          key={date}
+          className={`calendar-cell ${getColorClass(itemCount)}`}
+          onClick={() => {
+            setSelectedDate(dateString);
+            onDateClick && onDateClick(dateString);
+          }}
         >
-          <div>{day}</div>
-          {itemCount > 0 && <div className="text-xs">{itemCount} items</div>}
+          <div className="date-number">{date}</div>
+          <div className="item-count">{itemCount > 0 ? `${itemCount}` : ''}</div>
         </td>
       );
 
-      if ((cells.length + firstDayOfMonth) % 7 === 0 || day === daysInMonth) {
-        rows.push(<tr key={day}>{cells}</tr>);
-        cells = [];
+      if (days.length === 7) {
+        weeks.push(<tr key={`week-${date}`}>{days}</tr>);
+        days = [];
       }
     }
 
+    if (days.length > 0) {
+      while (days.length < 7) days.push(<td key={`filler-${days.length}`}></td>);
+      weeks.push(<tr key="last-week">{days}</tr>);
+    }
+
     return (
-      <div key={`${year}-${month}`} className="calendar-container">
-        <h3>{getMonthName(month)}</h3>
+      <div key={monthIndex} className="calendar-month">
+        <h3>{months[monthIndex]}</h3>
         <table className="calendar-table">
           <thead>
             <tr>
-              {["S", "M", "T", "W", "T", "F", "S"].map((d) => (
-                <th key={d} className="border p-2">{d}</th>
-              ))}
+              <th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th>
             </tr>
           </thead>
-          <tbody>{rows}</tbody>
+          <tbody>{weeks}</tbody>
         </table>
+
+        {selectedDate === `${currentYear}-${String(monthIndex + 1).padStart(2, '0')}-${String(
+          new Date(selectedDate).getDate()
+        ).padStart(2, '0')}` && (
+          <div className="dropdown-info">
+            <strong>Bookings for {selectedDate}</strong>
+            <ul>
+              {getBookingsForDate(selectedDate).map((b, i) => (
+                <li key={i}>{b.name} - {b.email} - {b.timeSlot} - {b.items} items</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     );
   };
 
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth();
-
   return (
-    <div className={`grid ${showFullYear ? "grid-cols-3 gap-4" : ""}`}>
-      {showFullYear
-        ? Array.from({ length: 12 }, (_, i) => renderCalendar(currentYear, i))
-        : renderCalendar(currentYear, currentMonth)}
+    <div className="calendar-grid">
+      {(showFullYear ? months : [months[new Date().getMonth()]]).map((_, i) =>
+        showFullYear || i === new Date().getMonth() ? renderMonth(i) : null
+      )}
     </div>
   );
 };
