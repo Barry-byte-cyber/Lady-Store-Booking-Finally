@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import CalendarView from './CalendarView';
+import CalendarView from "./Components/CalendarView";
 
 const AdminView = () => {
   const [allBookings, setAllBookings] = useState({});

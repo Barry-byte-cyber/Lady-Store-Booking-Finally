@@ -2,6 +2,7 @@ import React from "react";
 import BookingForm from "./Components/BookingForm";
 import AdminView from "./Components/AdminView";
 import Login from "./Components/Login";
+import CalendarView from "./Components/CalendarView";
 
 function App() {
   console.log("Force rebuild");
