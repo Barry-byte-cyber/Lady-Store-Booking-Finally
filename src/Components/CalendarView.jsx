@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import './CalendarView.css';
 
-const months = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
+const CalendarView = ({ bookings = [], onDateClick, showFullYear = false }) => {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
 
-const CalendarView = ({ bookings, onDateClick, showFullYear = false }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const currentYear = new Date().getFullYear();
 
@@ -17,10 +16,10 @@ const CalendarView = ({ bookings, onDateClick, showFullYear = false }) => {
   };
 
   const getColorClass = (count) => {
-    if (count >= 60) return 'bg-red';
-    if (count >= 40) return 'bg-yellow';
-    if (count > 0) return 'bg-green';
-    return 'bg-default';
+    if (count >= 60) return 'bg-red-400';
+    if (count >= 40) return 'bg-yellow-300';
+    if (count > 0) return 'bg-green-300';
+    return 'bg-gray-100';
   };
 
   const renderMonth = (monthIndex) => {
@@ -29,7 +28,7 @@ const CalendarView = ({ bookings, onDateClick, showFullYear = false }) => {
     const weeks = [];
     let days = [];
 
-    // Fill initial empty days
+    // Fill in empty starting days
     for (let i = 0; i < firstDay.getDay(); i++) {
       days.push(<td key={`empty-${i}`}></td>);
     }
@@ -39,19 +38,22 @@ const CalendarView = ({ bookings, onDateClick, showFullYear = false }) => {
       const dateString = dateObj.toISOString().split('T')[0];
       const dateBookings = getBookingsForDate(dateString);
       const itemCount = dateBookings.reduce((sum, b) => sum + parseInt(b.items), 0);
-
+      const colorClass = getColorClass(itemCount);
       const isSelected = selectedDate === dateString;
+
       days.push(
         <td
           key={date}
-          className={`calendar-cell ${getColorClass(itemCount)}`}
+          className={`border p-2 text-center cursor-pointer rounded ${colorClass} ${
+            isSelected ? 'ring-2 ring-black' : ''
+          }`}
           onClick={() => {
             setSelectedDate(dateString);
             onDateClick && onDateClick(dateString);
           }}
         >
-          <div className="date-number">{date}</div>
-          <div className="item-count">{itemCount > 0 ? `${itemCount}` : ''}</div>
+          <div className="text-sm font-medium">{date}</div>
+          <div className="text-xs">{itemCount > 0 ? `${itemCount} items` : ''}</div>
         </td>
       );
 
@@ -67,35 +69,38 @@ const CalendarView = ({ bookings, onDateClick, showFullYear = false }) => {
     }
 
     return (
-      <div key={monthIndex} className="calendar-month">
-        <h3>{months[monthIndex]}</h3>
-        <table className="calendar-table">
+      <div key={monthIndex} className="calendar-month m-2">
+        <h3 className="text-center font-bold text-lg mb-1">{months[monthIndex]}</h3>
+        <table className="w-full text-xs">
           <thead>
             <tr>
-              <th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th>
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d) => (
+                <th key={d} className="font-medium">{d}</th>
+              ))}
             </tr>
           </thead>
           <tbody>{weeks}</tbody>
         </table>
 
-        {selectedDate === `${currentYear}-${String(monthIndex + 1).padStart(2, '0')}-${String(
-          new Date(selectedDate).getDate()
-        ).padStart(2, '0')}` && (
-          <div className="dropdown-info">
-            <strong>Bookings for {selectedDate}</strong>
-            <ul>
-              {getBookingsForDate(selectedDate).map((b, i) => (
-                <li key={i}>{b.name} - {b.email} - {b.timeSlot} - {b.items} items</li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {selectedDate &&
+          selectedDate.startsWith(`${currentYear}-${String(monthIndex + 1).padStart(2, '0')}`) && (
+            <div className="bg-gray-100 p-2 mt-2 rounded">
+              <strong>Bookings for {selectedDate}</strong>
+              <ul className="list-disc list-inside">
+                {getBookingsForDate(selectedDate).map((b, i) => (
+                  <li key={i}>
+                    {b.name} - {b.email} - {b.timeSlot} - {b.items} items
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
       </div>
     );
   };
 
   return (
-    <div className="calendar-grid">
+    <div className={`calendar-grid grid ${showFullYear ? 'grid-cols-3 gap-4' : ''}`}>
       {(showFullYear ? months : [months[new Date().getMonth()]]).map((_, i) =>
         showFullYear || i === new Date().getMonth() ? renderMonth(i) : null
       )}
