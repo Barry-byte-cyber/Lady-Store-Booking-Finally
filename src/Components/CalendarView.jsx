@@ -21,7 +21,7 @@ function CalendarView({ onDateClick, showFullYear = false, bookingDetails = {}, 
     }
 
     return (
-      <div key={`${year}-${month}`} className="w-1/3 p-2">
+      <div key={`${year}-${month}`} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2">
         <h3 className="text-center font-bold mb-2">
           {new Date(year, month).toLocaleString("default", { month: "long" })}
         </h3>
