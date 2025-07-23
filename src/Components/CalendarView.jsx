@@ -1,8 +1,18 @@
 import React from "react";
 import "./CalendarView.css";
 
-const CalendarView = ({ showFullYear = false, onDateClick, bookingDetails = {}, selectedDate }) => {
+const CalendarView = ({
+  showFullYear = false,
+  onDateClick,
+  bookingDetails = {},
+  selectedDate,
+}) => {
   const today = new Date();
+  const currentYear = today.getFullYear();
+
+  const months = showFullYear
+    ? Array.from({ length: 12 }, (_, i) => i)
+    : [today.getMonth()];
 
   const renderMonth = (year, month) => {
     const firstDay = new Date(year, month, 1);
@@ -10,8 +20,7 @@ const CalendarView = ({ showFullYear = false, onDateClick, bookingDetails = {}, 
     const weeks = [];
     let days = [];
 
-    const startDay = firstDay.getDay(); // Sunday = 0
-    for (let i = 0; i < startDay; i++) {
+    for (let i = 0; i < firstDay.getDay(); i++) {
       days.push(null);
     }
 
@@ -24,22 +33,29 @@ const CalendarView = ({ showFullYear = false, onDateClick, bookingDetails = {}, 
     }
 
     return (
-      <div className="month-container" key={month}>
-        <h3>{today.toLocaleString("default", { month })}</h3>
+      <div key={`${year}-${month}`} className="month-container">
+        <h3>{today.toLocaleString("default", { month: "long" })}</h3>
         <div className="calendar-grid">
           {["S", "M", "T", "W", "T", "F", "S"].map((d) => (
             <div key={d} className="day-header">{d}</div>
           ))}
+
           {weeks.flat().map((date, idx) => {
             const isSelected =
               date &&
               selectedDate &&
               date.toDateString() === selectedDate.toDateString();
-            const day = date ? date.getDate() : "";
 
-            const bookingCount = date
-              ? (bookingDetails[date.toISOString().split("T")[0]]?.length || 0)
+            const day = date ? date.getDate() : "";
+            const dateKey = date?.toISOString().split("T")[0];
+            const bookingCount = bookingDetails[dateKey]
+              ? bookingDetails[dateKey].reduce((acc, b) => acc + Number(b.items), 0)
               : 0;
+
+            let bgColor = "";
+            if (bookingCount >= 80) bgColor = "bg-blue";
+            else if (bookingCount > 40) bgColor = "bg-yellow";
+            else if (bookingCount > 0) bgColor = "bg-green";
 
             return (
               <div
@@ -48,7 +64,9 @@ const CalendarView = ({ showFullYear = false, onDateClick, bookingDetails = {}, 
                 onClick={() => date && onDateClick && onDateClick(date)}
               >
                 {day}
-                {bookingCount > 0 && <span className="booking-count">*</span>}
+                {bookingCount > 0 && (
+                  <span className="booking-count">*</span>
+                )}
               </div>
             );
           })}
@@ -56,11 +74,6 @@ const CalendarView = ({ showFullYear = false, onDateClick, bookingDetails = {}, 
       </div>
     );
   };
-
-  const currentYear = today.getFullYear();
-  const months = showFullYear
-    ? Array.from({ length: 12 }, (_, i) => i)
-    : [today.getMonth()];
 
   return (
     <div className="calendar-wrapper">

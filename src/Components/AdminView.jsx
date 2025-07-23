@@ -24,7 +24,7 @@ const AdminView = () => {
       <CalendarView
         onDateClick={(date) => setSelectedDate(date)}
         showFullYear={true}
-        bookingDetails={allBookings}
+        bookingDetails={bookings}
         selectedDate={selectedDate}
       />
 
