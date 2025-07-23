@@ -1,83 +1,82 @@
 import React from "react";
 import "./CalendarView.css";
 
-const CalendarView = ({
-  showFullYear = false,
-  onDateClick,
-  bookingDetails = {},
-  selectedDate,
-}) => {
+const CalendarView = ({ showFullYear = false, onDateClick, bookingDetails = {}, selectedDate }) => {
   const today = new Date();
-  const currentYear = today.getFullYear();
 
-  const months = showFullYear
-    ? Array.from({ length: 12 }, (_, i) => i)
-    : [today.getMonth()];
+  const getMonthName = (monthIndex) => {
+    return new Date(2023, monthIndex, 1).toLocaleString("default", { month: "long" });
+  };
 
-  const renderMonth = (year, month) => {
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const weeks = [];
-    let days = [];
+  const getDaysInMonth = (year, month) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
 
-    for (let i = 0; i < firstDay.getDay(); i++) {
-      days.push(null);
+  const getColorClass = (count) => {
+    if (count >= 60) return "bg-red-200";
+    if (count >= 30) return "bg-yellow-200";
+    if (count > 0) return "bg-green-200";
+    return "";
+  };
+
+  const renderCalendar = (year, month) => {
+    const daysInMonth = getDaysInMonth(year, month);
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    const rows = [];
+    let cells = [];
+
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      cells.push(<td key={`empty-${i}`} className="border p-2" />);
     }
 
-    for (let day = 1; day <= lastDay.getDate(); day++) {
-      days.push(new Date(year, month, day));
-    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateKey = new Date(year, month, day).toISOString().split("T")[0];
+      const bookings = bookingDetails[dateKey] || [];
+      const itemCount = bookings.reduce((total, b) => total + Number(b.items || 0), 0);
+      const colorClass = getColorClass(itemCount);
 
-    while (days.length) {
-      weeks.push(days.splice(0, 7));
+      cells.push(
+        <td
+          key={day}
+          className={`border p-2 cursor-pointer ${colorClass}`}
+          onClick={() => onDateClick && onDateClick(new Date(year, month, day))}
+        >
+          <div>{day}</div>
+          {itemCount > 0 && <div className="text-xs">{itemCount} items</div>}
+        </td>
+      );
+
+      if ((cells.length + firstDayOfMonth) % 7 === 0 || day === daysInMonth) {
+        rows.push(<tr key={day}>{cells}</tr>);
+        cells = [];
+      }
     }
 
     return (
-      <div key={`${year}-${month}`} className="month-container">
-        <h3>{today.toLocaleString("default", { month: "long" })}</h3>
-        <div className="calendar-grid">
-          {["S", "M", "T", "W", "T", "F", "S"].map((d) => (
-            <div key={d} className="day-header">{d}</div>
-          ))}
-
-          {weeks.flat().map((date, idx) => {
-            const isSelected =
-              date &&
-              selectedDate &&
-              date.toDateString() === selectedDate.toDateString();
-
-            const day = date ? date.getDate() : "";
-            const dateKey = date?.toISOString().split("T")[0];
-            const bookingCount = bookingDetails[dateKey]
-              ? bookingDetails[dateKey].reduce((acc, b) => acc + Number(b.items), 0)
-              : 0;
-
-            let bgColor = "";
-            if (bookingCount >= 80) bgColor = "bg-blue";
-            else if (bookingCount > 40) bgColor = "bg-yellow";
-            else if (bookingCount > 0) bgColor = "bg-green";
-
-            return (
-              <div
-                key={idx}
-                className={`day-cell ${isSelected ? "selected" : ""}`}
-                onClick={() => date && onDateClick && onDateClick(date)}
-              >
-                {day}
-                {bookingCount > 0 && (
-                  <span className="booking-count">*</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
+      <div key={`${year}-${month}`} className="calendar-container">
+        <h3>{getMonthName(month)}</h3>
+        <table className="calendar-table">
+          <thead>
+            <tr>
+              {["S", "M", "T", "W", "T", "F", "S"].map((d) => (
+                <th key={d} className="border p-2">{d}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </table>
       </div>
     );
   };
 
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth();
+
   return (
-    <div className="calendar-wrapper">
-      {months.map((month) => renderMonth(currentYear, month))}
+    <div className={`grid ${showFullYear ? "grid-cols-3 gap-4" : ""}`}>
+      {showFullYear
+        ? Array.from({ length: 12 }, (_, i) => renderCalendar(currentYear, i))
+        : renderCalendar(currentYear, currentMonth)}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import CalendarView from "./CalendarView";
 
 const AdminView = () => {
@@ -7,13 +7,14 @@ const AdminView = () => {
   const [bookingsForDate, setBookingsForDate] = useState([]);
 
   useEffect(() => {
-    const storedBookings = JSON.parse(localStorage.getItem('bookings')) || {};
+    const storedBookings = JSON.parse(localStorage.getItem("bookings") || "{}");
     setAllBookings(storedBookings);
   }, []);
 
   useEffect(() => {
     if (selectedDate) {
-      const bookings = allBookings[selectedDate.toISOString().split("T")[0]] || [];
+      const dateKey = selectedDate.toISOString().split("T")[0];
+      const bookings = allBookings[dateKey] || [];
       setBookingsForDate(bookings);
     }
   }, [selectedDate, allBookings]);
@@ -22,19 +23,20 @@ const AdminView = () => {
     <div className="admin-view p-4">
       <h2 className="text-2xl font-bold mb-4">Admin View</h2>
       <CalendarView
-        onDateClick={(date) => setSelectedDate(date)}
         showFullYear={true}
-        bookingDetails={bookings}
+        onDateClick={(date) => setSelectedDate(date)}
+        bookingDetails={allBookings}
         selectedDate={selectedDate}
       />
-
       {selectedDate && bookingsForDate.length > 0 && (
-        <div style={{ marginTop: '20px', padding: '10px', border: '1px solid gray' }}>
-          <h2>Bookings for {selectedDate.toDateString()}</h2>
+        <div className="mt-4 border p-4">
+          <h3 className="font-semibold mb-2">
+            Bookings for {selectedDate.toDateString()}
+          </h3>
           <ul>
-            {bookingsForDate.map((booking, index) => (
-              <li key={index}>
-                <strong>{booking.name}</strong> — {booking.email} — {booking.items} items
+            {bookingsForDate.map((b, i) => (
+              <li key={i}>
+                <strong>{b.name}</strong> – {b.email} – {b.items} items
               </li>
             ))}
           </ul>
