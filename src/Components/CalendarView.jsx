@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 function CalendarView({
   onDateClick,
@@ -7,81 +7,78 @@ function CalendarView({
   selectedDate = null,
 }) {
   const today = new Date();
-  const year = today.getFullYear();
 
-  const months = Array.from({ length: 12 }, (_, i) => {
-    const date = new Date(year, i);
-    return {
-      name: date.toLocaleString('default', { month: 'long' }),
-      index: i,
-    };
-  });
+  const generateMonths = () => {
+    const months = [];
+    const currentYear = today.getFullYear();
 
-  const getDaysInMonth = (month, year) =>
-    new Date(year, month + 1, 0).getDate();
+    for (let month = 0; month < 12; month++) {
+      const firstDay = new Date(currentYear, month, 1);
+      const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
+      const startDay = firstDay.getDay();
+      const weeks = [];
+      let day = 1 - startDay;
 
-  const getStartDay = (month, year) =>
-    new Date(year, month, 1).getDay(); // Sunday = 0
+      for (let week = 0; week < 6; week++) {
+        const days = [];
+        for (let i = 0; i < 7; i++) {
+          const current = new Date(currentYear, month, day);
+          const dateKey = current.toISOString().split("T")[0];
+          const bookingCount = bookings[dateKey] || 0;
+          const isCurrentMonth = current.getMonth() === month;
 
-  const formatDate = (y, m, d) => {
-    const mm = String(m + 1).padStart(2, '0');
-    const dd = String(d).padStart(2, '0');
-    return `${y}-${mm}-${dd}`;
-  };
+          days.push(
+            <div
+              key={i}
+              onClick={() => isCurrentMonth && onDateClick && onDateClick(dateKey)}
+              className={`h-20 border p-1 text-center cursor-pointer ${
+                isCurrentMonth ? "bg-white hover:bg-blue-100" : "bg-gray-100 text-gray-400"
+              } ${selectedDate === dateKey ? "border-2 border-blue-600" : ""}`}
+            >
+              <div className="font-bold">{isCurrentMonth ? current.getDate() : ""}</div>
+              {isCurrentMonth && bookingCount > 0 && (
+                <div className="text-xs text-green-700 font-semibold">
+                  {bookingCount}
+                </div>
+              )}
+            </div>
+          );
+          day++;
+        }
+        weeks.push(
+          <div key={week} className="grid grid-cols-7">
+            {days}
+          </div>
+        );
+      }
 
-  const getColorClass = (count) => {
-    if (count >= 80) return 'bg-red-500 text-white';
-    if (count >= 40) return 'bg-yellow-400';
-    if (count > 0) return 'bg-green-400';
-    return '';
+      months.push(
+        <div key={month} className="border rounded p-2 shadow-md bg-white">
+          <h2 className="text-lg font-semibold text-center mb-2">
+            {firstDay.toLocaleString("default", { month: "long" })}
+          </h2>
+          <div className="grid grid-cols-7 text-xs font-bold text-center text-gray-600 border-b pb-1">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          {weeks}
+        </div>
+      );
+    }
+
+    return months;
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-      {months.map((month) => {
-        const daysInMonth = getDaysInMonth(month.index, year);
-        const startDay = getStartDay(month.index, year);
-
-        return (
-          <div key={month.name} className="border rounded-lg shadow-md p-2 bg-white">
-            <h3 className="text-center font-semibold text-lg mb-2">
-              {month.name} {year}
-            </h3>
-            <div className="grid grid-cols-7 gap-1 text-center font-semibold">
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                <div key={day}>{day}</div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 gap-1 mt-1 text-center">
-              {Array.from({ length: startDay }).map((_, i) => (
-                <div key={`blank-${i}`}></div>
-              ))}
-              {Array.from({ length: daysInMonth }).map((_, dayIndex) => {
-                const day = dayIndex + 1;
-                const dateStr = formatDate(year, month.index, day);
-                const itemCount = bookings[dateStr] || 0;
-
-                return (
-                  <div
-                    key={day}
-                    onClick={() => onDateClick && onDateClick(dateStr)}
-                    className={`cursor-pointer border rounded-md h-16 flex flex-col items-center justify-center ${getColorClass(
-                      itemCount
-                    )} ${selectedDate === dateStr ? 'ring-2 ring-blue-500' : ''}`}
-                  >
-                    <div className="text-sm font-medium">{day}</div>
-                    {itemCount > 0 && (
-                      <div className="text-xs font-semibold">
-                        {itemCount}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
+    <div className="p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {generateMonths()}
+      </div>
     </div>
   );
 }
