@@ -1,86 +1,76 @@
 import React from "react";
 
-function CalendarView({
-  onDateClick,
-  showFullYear = false,
-  bookings = {},
-  selectedDate = null,
-}) {
-  const today = new Date();
+const CalendarView = ({ bookings = [], onDateClick, showFullYear = false }) => {
+  const currentYear = new Date().getFullYear();
 
-  const generateMonths = () => {
-    const months = [];
-    const currentYear = today.getFullYear();
+  const generateCalendar = (year, month) => {
+    const date = new Date(year, month, 1);
+    const days = [];
 
-    for (let month = 0; month < 12; month++) {
-      const firstDay = new Date(currentYear, month, 1);
-      const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
-      const startDay = firstDay.getDay();
-      const weeks = [];
-      let day = 1 - startDay;
+    const firstDayIndex = date.getDay();
+    const lastDay = new Date(year, month + 1, 0).getDate();
 
-      for (let week = 0; week < 6; week++) {
-        const days = [];
-        for (let i = 0; i < 7; i++) {
-          const current = new Date(currentYear, month, day);
-          const dateKey = current.toISOString().split("T")[0];
-          const bookingCount = bookings[dateKey] || 0;
-          const isCurrentMonth = current.getMonth() === month;
-
-          days.push(
-            <div
-              key={i}
-              onClick={() => isCurrentMonth && onDateClick && onDateClick(dateKey)}
-              className={`h-20 border p-1 text-center cursor-pointer ${
-                isCurrentMonth ? "bg-white hover:bg-blue-100" : "bg-gray-100 text-gray-400"
-              } ${selectedDate === dateKey ? "border-2 border-blue-600" : ""}`}
-            >
-              <div className="font-bold">{isCurrentMonth ? current.getDate() : ""}</div>
-              {isCurrentMonth && bookingCount > 0 && (
-                <div className="text-xs text-green-700 font-semibold">
-                  {bookingCount}
-                </div>
-              )}
-            </div>
-          );
-          day++;
-        }
-        weeks.push(
-          <div key={week} className="grid grid-cols-7">
-            {days}
-          </div>
-        );
-      }
-
-      months.push(
-        <div key={month} className="border rounded p-2 shadow-md bg-white">
-          <h2 className="text-lg font-semibold text-center mb-2">
-            {firstDay.toLocaleString("default", { month: "long" })}
-          </h2>
-          <div className="grid grid-cols-7 text-xs font-bold text-center text-gray-600 border-b pb-1">
-            <div>Sun</div>
-            <div>Mon</div>
-            <div>Tue</div>
-            <div>Wed</div>
-            <div>Thu</div>
-            <div>Fri</div>
-            <div>Sat</div>
-          </div>
-          {weeks}
-        </div>
-      );
+    for (let i = 0; i < firstDayIndex; i++) {
+      days.push(null); // Empty cells before 1st of month
     }
 
-    return months;
+    for (let day = 1; day <= lastDay; day++) {
+      days.push(new Date(year, month, day));
+    }
+
+    return days;
+  };
+
+  const getBookingCount = (date) => {
+    const dateStr = date.toISOString().split("T")[0];
+    const booking = bookings.find((b) => b.date === dateStr);
+    return booking ? booking.items : 0;
+  };
+
+  const renderMonth = (monthIndex) => {
+    const monthName = new Date(currentYear, monthIndex).toLocaleString("default", { month: "long" });
+    const days = generateCalendar(currentYear, monthIndex);
+
+    return (
+      <div key={monthIndex} className="p-2">
+        <h3 className="text-lg font-semibold mb-2">{monthName}</h3>
+        <div className="grid grid-cols-7 gap-2 text-center text-sm font-medium text-gray-700">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+            <div key={d}>{d}</div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-2 text-center mt-1">
+          {days.map((date, idx) => {
+            if (!date) {
+              return <div key={idx} />;
+            }
+
+            const bookingCount = getBookingCount(date);
+            const isFullyBooked = bookingCount >= 80;
+
+            return (
+              <div
+                key={idx}
+                className={`border rounded-lg p-1 cursor-pointer text-xs ${
+                  isFullyBooked ? "bg-green-300" : "bg-blue-200"
+                }`}
+                onClick={() => onDateClick && onDateClick(date)}
+              >
+                <div>{date.getDate()}</div>
+                {bookingCount > 0 && <div className="text-[10px]">{bookingCount}</div>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {generateMonths()}
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+      {(showFullYear ? Array.from({ length: 12 }, (_, i) => i) : [new Date().getMonth()]).map(renderMonth)}
     </div>
   );
-}
+};
 
 export default CalendarView;
