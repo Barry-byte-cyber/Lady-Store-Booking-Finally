@@ -12,6 +12,7 @@ function App() {
 
   return (
     <div>
+<h1 className="text-2xl font-bold text-green-600">Tailwind Test</h1>
       {isAdmin ? (
         sessionStorage.getItem("isAdmin") === "true" ? (
           <AdminView />
