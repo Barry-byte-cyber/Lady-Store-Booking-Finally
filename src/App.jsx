@@ -1,9 +1,9 @@
+import './index.css'; 
 import React from "react";
 import BookingForm from "./Components/BookingForm";
 import AdminView from "./Components/AdminView";
 import Login from "./Components/Login";
 import CalendarView from "./Components/CalendarView";
-import './index.css'; 
 
 function App() {
   console.log("Force rebuild");
